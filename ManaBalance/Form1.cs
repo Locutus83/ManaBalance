@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,64 +13,95 @@ namespace ManaBalance
 {
     public partial class Form1 : Form
     {
-        double BlackMana = 0, 
-               WhiteMana = 0, 
-               BlueMana = 0, 
-               GreenMana = 0, 
-               RedMana = 0, 
-               ColorlessMana = 0, 
-               BlackCard = 0, 
-               WhiteCard = 0, 
-               BlueCard = 0, 
-               GreenCard = 0, 
-               RedCard = 0, 
-               ColorlessCard = 0;
-        
-        private enum ManaColor : int
-        {
-            Black = 0,
-            White = 1,
-            Blue = 2,
-            Green = 3,
-            Red = 4,
-            Colorless = 5
-        }
+        private double BlackMana = 0;
+        private double WhiteMana = 0;
+        private double BlueMana = 0;
+        private double GreenMana = 0;
+        private double RedMana = 0;
+        private double ColorlessMana = 0;
+        private double BlackCard = 0;
+        private double WhiteCard = 0;
+        private double BlueCard = 0;
+        private double GreenCard = 0;
+        private double RedCard = 0;
+        private double ColorlessCard = 0;
 
-        private void UpdateManaLabel(double manaIncrease, double cardIncrease, ManaColor color)
+        private void UpdateMana(double manaIncrease, double cardIncrease, string color)
         {
             switch (color)
             {
-                case ManaColor.Black:
+                case "Black":
+                    if (BlackMana + manaIncrease < 0 || BlackCard + cardIncrease < 0)
+                    {
+                        return;
+                    }
                     BlackMana = BlackMana + manaIncrease;
                     BlackCard = BlackCard + cardIncrease;
-                    lblSwampCount.Text = BlackMana + "/" + BlackCard + " = " + (BlackMana / BlackCard);
+                    UpdateManaLabel(BlackMana.ToString(), BlackCard.ToString(), (BlackMana * 100 / BlackCard).ToString("N1"), lblSwampCount);
                     break;
-                case ManaColor.Blue:
+                case "Blue":
+                    if (BlueMana + manaIncrease < 0 || BlueCard + cardIncrease < 0)
+                    {
+                        return;
+                    }
                     BlueMana = BlueMana + manaIncrease;
                     BlueCard = BlueCard + cardIncrease;
-                    lblIslandCount.Text = BlueMana + "/" + BlueCard + " = " + (BlueMana / BlueCard);
+                    UpdateManaLabel(BlueMana.ToString(), BlueCard.ToString(), (BlueMana * 100 / BlueCard).ToString(), lblIslandCount);
                     break;
-                case ManaColor.Green:
+                case "Green":
+                    if (GreenMana + manaIncrease < 0 || GreenCard + cardIncrease < 0)
+                    {
+                        return;
+                    }
                     GreenMana = GreenMana + manaIncrease;
                     GreenCard = GreenCard + cardIncrease;
-                    lblForestCount.Text = GreenMana + "/" + GreenCard + " = " + (GreenMana / GreenCard);
+                    UpdateManaLabel(GreenMana.ToString(), GreenCard.ToString(), (GreenMana * 100 / GreenCard).ToString(), lblForestCount);
                     break;
-                case ManaColor.White:
+                case "White":
+                    if (WhiteMana + manaIncrease < 0 || WhiteCard + cardIncrease < 0)
+                    {
+                        return;
+                    }
                     WhiteMana = WhiteMana + manaIncrease;
                     WhiteCard = WhiteCard + cardIncrease;
-                    lblPlainsCount.Text = WhiteMana + "/" + WhiteCard + " = " + (WhiteMana / WhiteCard);
+                    UpdateManaLabel(WhiteMana.ToString(), WhiteCard.ToString(), (WhiteMana * 100 / WhiteCard).ToString(), lblPlainsCount);
                     break;
-                case ManaColor.Red:
+                case "Red":
+                    if (RedMana + manaIncrease < 0 || RedCard + cardIncrease < 0)
+                    {
+                        return;
+                    }
                     RedMana = RedMana + manaIncrease;
                     RedCard = RedCard + cardIncrease;
-                    lblMountainCount.Text = RedMana + "/" + RedCard + " = " + (RedMana / RedCard);
+                    UpdateManaLabel(RedMana.ToString(), RedCard.ToString(), (RedMana * 100 / RedCard).ToString(), lblMountainCount);
                     break;
-                case ManaColor.Colorless:
+                case "Colorless":
+                    if (ColorlessMana + manaIncrease < 0 || ColorlessCard + cardIncrease < 0)
+                    {
+                        return;
+                    }
                     ColorlessMana = ColorlessMana + manaIncrease;
                     ColorlessCard = ColorlessCard + cardIncrease;
-                    lblColorlessCount.Text = ColorlessMana + "/" + ColorlessCard + " = " + (ColorlessMana / ColorlessCard);
+                    UpdateManaLabel(ColorlessMana.ToString(), ColorlessCard.ToString(), (ColorlessMana * 100 / ColorlessCard).ToString(), lblColorlessCount);
                     break;
             }
+        }
+
+        private void UpdateManaLabel(string newValue, string oldValue, string percent, Label lbl)
+        {
+            if (percent.Equals("NaN", StringComparison.OrdinalIgnoreCase))
+            {
+                percent = "0%";
+            }
+            else if (percent.Equals("Infinity", StringComparison.OrdinalIgnoreCase))
+            {
+                percent = "100%";
+            }
+            else
+            {
+                percent = percent + "%";
+            }
+            lbl.Text = newValue + "/" + oldValue + " = " + percent;
         }
 
         public Form1()
@@ -77,64 +109,23 @@ namespace ManaBalance
             InitializeComponent();
         }
 
-        private void pbSwamp_Click(object sender, EventArgs e)
+        private void button1_Click(object sender, EventArgs e)
         {
-            UpdateManaLabel(1, 0, ManaColor.Black);
+            Button btn = (Button) sender;
+
+            if (btn.Tag.ToString().Substring(0,1) == "-")
+            {
+                UpdateMana(0, -1, btn.Tag.ToString().Substring(1));
+            }
+            else
+            {
+                UpdateMana(0, 1, btn.Tag.ToString().Substring(1));                
+            }
         }
 
-        private void pbPlains_Click(object sender, EventArgs e)
+        private void pbColorless_MouseUp(object sender, MouseEventArgs e)
         {
-            UpdateManaLabel(1, 0, ManaColor.White);
-        }
-
-        private void pbIsland_Click(object sender, EventArgs e)
-        {
-            UpdateManaLabel(1, 0, ManaColor.Blue);
-        }
-
-        private void pbForest_Click(object sender, EventArgs e)
-        {
-            UpdateManaLabel(1, 0, ManaColor.Green);
-        }
-
-        private void pbMountain_Click(object sender, EventArgs e)
-        {
-            UpdateManaLabel(1, 0, ManaColor.Red);
-        }
-
-        private void pbColorless_Click(object sender, EventArgs e)
-        {
-            UpdateManaLabel(1, 0, ManaColor.Colorless);
-        }
-
-        private void btnAddBlack_Click(object sender, EventArgs e)
-        {
-            UpdateManaLabel(0, 1, ManaColor.Black);
-        }
-
-        private void btnAddWhite_Click(object sender, EventArgs e)
-        {
-            UpdateManaLabel(0, 1, ManaColor.White);
-        }
-
-        private void btnAddBlue_Click(object sender, EventArgs e)
-        {
-            UpdateManaLabel(0, 1, ManaColor.Blue);
-        }
-
-        private void btnAddGreen_Click(object sender, EventArgs e)
-        {
-            UpdateManaLabel(0, 1, ManaColor.Green);
-        }
-
-        private void btnAddRed_Click(object sender, EventArgs e)
-        {
-            UpdateManaLabel(0, 1, ManaColor.Red);
-        }
-
-        private void btnAddColorless_Click(object sender, EventArgs e)
-        {
-            UpdateManaLabel(0, 1, ManaColor.Colorless);
+            UpdateMana(e.Button == MouseButtons.Right ? -1 : 1, 0, ((PictureBox) sender).Tag.ToString());
         }
     }
 }
